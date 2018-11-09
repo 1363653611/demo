@@ -17,6 +17,8 @@ public class JodaTime {
     //测试时间输出格式
     private static void testTimeStyle() {
         //输出时间格式：2018-10-24T15:30:33.574+08:00
-        System.out.println(DateTime.now());
+        final DateTime today = DateTime.now().withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+        final DateTime end = today.minusDays(24);
+        System.out.println(end);
     }
 }

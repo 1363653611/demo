@@ -1,5 +1,7 @@
 package com.zbcn.demo.regular;
 
+import org.springframework.web.util.UriComponentsBuilder;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,7 +35,8 @@ public class RegularTest {
         //testBackReference();
         //replace();
         //GreedyMatch();
-        lazyMatch();
+        //lazyMatch();
+        urlMatch("/hotels/42?filter=123");
     }
 
 
@@ -194,5 +197,50 @@ public class RegularTest {
         //作用：匹配非pattern表达式的后面内容，不返回本身。
         reg = "(?<!祖国)朵";
         testMataCharacter(reg,test);
+    }
+
+
+    private static void urlMatch(String uri){
+        final Pattern QUERY_PARAM_PATTERN = Pattern.compile("([^&=]+)(=?)([^&]+)?");
+
+        final String SCHEME_PATTERN = "([^:/?#]+):";
+
+        final String HTTP_PATTERN = "(?i)(http|https):";
+
+        final String USERINFO_PATTERN = "([^@\\[/?#]*)";
+
+        final String HOST_IPV4_PATTERN = "[^\\[/?#:]*";
+
+        final String HOST_IPV6_PATTERN = "\\[[\\p{XDigit}\\:\\.]*[%\\p{Alnum}]*\\]";
+
+        final String HOST_PATTERN = "(" + HOST_IPV6_PATTERN + "|" + HOST_IPV4_PATTERN + ")";
+
+        final String PORT_PATTERN = "(\\d*(?:\\{[^/]+?\\})?)";
+
+        final String PATH_PATTERN = "([^?#]*)";
+
+        final String QUERY_PATTERN = "([^#]*)";
+
+        final String LAST_PATTERN = "(.*)";
+        final Pattern URI_PATTERN = Pattern.compile(
+                "^(" + SCHEME_PATTERN + ")?" + "(//(" + USERINFO_PATTERN + "@)?" + HOST_PATTERN + "(:" + PORT_PATTERN +
+                ")?" + ")?" + PATH_PATTERN + "(\\?" + QUERY_PATTERN + ")?" + "(#" + LAST_PATTERN + ")?");
+        Matcher matcher = URI_PATTERN.matcher(uri);
+        String scheme = matcher.group(2);
+        String userInfo = matcher.group(5);
+        String host = matcher.group(6);
+        String port = matcher.group(8);
+        String path = matcher.group(9);
+        String query = matcher.group(11);
+        String fragment = matcher.group(13);
+
+        System.out.println("scheme="+scheme);
+        System.out.println("userInfo="+userInfo);
+        System.out.println("host="+host);
+        System.out.println("path="+path);
+        System.out.println("port="+port);
+        System.out.println("query="+query);
+        System.out.println("fragment="+fragment);
+
     }
 }

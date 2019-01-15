@@ -1,14 +1,9 @@
-package com.zbcn.demo.data.clean;
+package com.zbcn.demo.inventory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
-import com.mongodb.Block;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
-import com.mongodb.client.FindIterable;
+import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Sorts;
@@ -29,8 +24,6 @@ import org.bson.BsonDateTime;
 import org.bson.BsonDocument;
 import org.bson.BsonString;
 import org.bson.Document;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -38,21 +31,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 /**
  * @author wanghongen
@@ -61,17 +44,18 @@ import java.util.stream.Collectors;
 public class ExportInventory {
     private static PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
     private static CloseableHttpClient httpClient = HttpClients.createSystem();
-    private static String token = "5e77b8a391844b5aa0328cadc9914304";
-//    private static MongoClient mongoClient = new MongoClient("localhost");
+    private static String token = "401cbd7940d74835ad017238093b4312";
+    private static String vehicleUrl = "https://p-api.kanche.com/v1";
+    //    private static MongoClient mongoClient = new MongoClient("localhost");
     private static MongoCredential credential = MongoCredential.createCredential("vehicle_rw", "admin", "Rfvbhu#!7620".toCharArray());
     private static MongoClient mongoClient = new MongoClient(new ServerAddress("10.3.9.32", 27017), credential, MongoClientOptions.builder().build());
-    private static MongoDatabase vehicle = mongoClient.getDatabase("vehicle");
-    private static MongoCollection<Document> vehicle_inventory = vehicle.getCollection("vehicle_inventory");
-    private static MongoCollection<Document> inventory_config = vehicle.getCollection("vehicle_inventory_config");
+    private static MongoDatabase vehicleDB = mongoClient.getDatabase("vehicle");
+    private static MongoCollection<Document> vehicle_inventory = vehicleDB.getCollection("vehicle_inventory");
+    private static MongoCollection<Document> inventory_config = vehicleDB.getCollection("vehicle_inventory_config");
     private static ObjectMapper objectMapper = new ObjectMapper();
-    private static String cities = cities();
+    //    private static String cities = cities();
     private static SXSSFWorkbook workbook = new SXSSFWorkbook(500);
-    private static ExecutorService executorService = Executors.newFixedThreadPool(48);
+    private static ExecutorService executorService = new ThreadPoolExecutor(31, 60, 60L, TimeUnit.SECONDS, new LinkedBlockingDeque<>());
     private static DateTimeFormatter formatter = ISODateTimeFormat.dateTimeParser();
     private static LinkedBlockingQueue<Event> events = new LinkedBlockingQueue<>();
     private static LinkedBlockingQueue<Future> futures = new LinkedBlockingQueue<>();
@@ -117,40 +101,31 @@ public class ExportInventory {
             BsonDocument inventoryQuery = new BsonDocument();
             inventoryQuery.append("cycleStartTime", new BsonDateTime(startTime.getTime()));
             vehicle_inventory.find(inventoryQuery).forEach((Block<? super Document>) (inventory) -> {
-                List<Document> vehicleInventoryDetails = inventory.get("vehicleInventoryDetails", Collections.emptyList());
+                List<Document> vehicleInventoryDetails = inventory.get("vehicleInventoryDetails", new  ArrayList());
                 if (vehicleInventoryDetails.isEmpty()) {
                     return;
                 }
-                List<String> ids = vehicleInventoryDetails.stream().map(document -> document.getString("vehicleId")).collect(Collectors.toList());
-                vehicleInventoryDetails.forEach(document -> {
-                    Future<?> submit = executorService.submit(() -> {
-                        String vehicleId = document.getString("vehicleId");
-                        JsonNode vehicle = getVehicle(vehicleId);
-                        Event event = new Event(title, sheet, vehicle, document);
+                Future<?> submit = executorService.submit(() -> {
+                    Map<String, Document> documentMap = vehicleInventoryDetails.stream().collect(toMap(document -> document.getString("vehicleId"), document -> document));
+                    Set<String> ids = documentMap.keySet();
+                    JsonNode vehicles = getVehicles(ids);
+                    JsonNode content = vehicles.at("/content");
+                    content.forEach(node -> {
+                        String vehicleId = node.get("id").asText();
+                        Event event = new Event(title, sheet, node, documentMap.get(vehicleId));
                         try {
                             events.put(event);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     });
-                    try {
-                        futures.put(submit);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                 });
-
+                try {
+                    futures.put(submit);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             });
-
-
-//            Future<?> submit = executorService.submit(() -> {
-//                try {
-//                    vehicles(sheet, 0, 200, title, new DateTime(startTime), new DateTime(endTime));
-//                } catch (IOException | InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            });
-//            futures.put(submit);
             System.out.println("starting");
         }
 
@@ -167,111 +142,111 @@ public class ExportInventory {
         ExportInventory.executorService.shutdownNow();
         threads.forEach(Thread::interrupt);
 
-        FileOutputStream fileOutputStream = new FileOutputStream("/Users/wanghongen/车源盘点_.xlsx");
+        FileOutputStream fileOutputStream = new FileOutputStream("D:\\inventory\\车源盘点_.xlsx");
         workbook.write(fileOutputStream);
         workbook.close();
         fileOutputStream.close();
     }
 
     private static JsonNode getVehicle(String id) {
-        String url = "https://p-api.kanche.com/v1/search/vehicles/" + id;
+        String url = vehicleUrl + "/search/vehicles/" + id;
         return requestApi(url);
     }
 
-    private static JsonNode getVehicles(List<String> ids) {
-        String url = "https://p-api.kanche.com/v1/search/vehicles?page=0&size=" + ids.size() + 1 + "&id=" + String.join(",", ids);
+    private static JsonNode getVehicles(Set<String> ids) {
+        String url = vehicleUrl + "/search/vehicles?page=0&size=" + ids.size() + 1 + "&id=" + String.join(",", ids);
         return requestApi(url);
     }
 
-    private static void vehicles(SXSSFSheet sheet, int page, int size, String title, DateTime startTime, DateTime endTime) throws IOException, InterruptedException {
-        String auditTime = startTime.minusDays(3).withZone(DateTimeZone.UTC).toString();
-        String url = String.format("https://p-api.kanche.com/v1/search/vehicles?page=%s&size=%s&saleStatus=on_sale,sold," +
-                "off_sale&businessGroupId=%s&auditTimeTo=%s&createdAtFrom=2018-07-27T18:00:00.000Z", page, size, cities, auditTime);
-        HttpGet httpGet = new HttpGet(url);
-        httpGet.setHeader("Authorization", token);
-        CloseableHttpResponse execute = httpClient.execute(httpGet);
-        JsonNode response = objectMapper.readTree(EntityUtils.toString(execute.getEntity()));
-        if (!response.get("ok").asBoolean()) {
-            System.err.println("error:" + response.toString());
-        }
-        JsonNode data = response.get("data");
-        JsonNode content = data.get("content");
-        for (JsonNode v : content) {
-            JsonNode status = v.get("status");
-            JsonNode inventoryStatus = status.get("inventoryStatus");
-//            if (inventoryStatus == null || inventoryStatus.isMissingNode() || inventoryStatus.isNull()) {
+//    private static void vehicles(SXSSFSheet sheet, int page, int size, String title, DateTime startTime, DateTime endTime) throws IOException, InterruptedException {
+//        String auditTime = startTime.minusDays(3).withZone(DateTimeZone.UTC).toString();
+//        String url = String.format("https://p-api.kanche.com/v1/search/vehicles?page=%s&size=%s&saleStatus=on_sale,sold," +
+//                "off_sale&businessGroupId=%s&auditTimeTo=%s&createdAtFrom=2018-07-27T18:00:00.000Z", page, size, cities, auditTime);
+//        HttpGet httpGet = new HttpGet(url);
+//        httpGet.setHeader("Authorization", token);
+//        CloseableHttpResponse execute = httpClient.execute(httpGet);
+//        JsonNode response = objectMapper.readTree(EntityUtils.toString(execute.getEntity()));
+//        if (!response.get("ok").asBoolean()) {
+//            System.err.println("error:" + response.toString());
+//        }
+//        JsonNode data = response.get("data");
+//        JsonNode content = data.get("content");
+//        for (JsonNode v : content) {
+//            JsonNode status = v.get("status");
+//            JsonNode inventoryStatus = status.get("inventoryStatus");
+////            if (inventoryStatus == null || inventoryStatus.isMissingNode() || inventoryStatus.isNull()) {
+////                continue;
+////            }
+//
+//            DateTime operatedAt = formatter.parseDateTime(status.get("operatedAt").asText());
+//            //下架时间必须小于周期开始时间
+//            if (!status.get("status").asText().equals("offline") && startTime.getMillis() < operatedAt.getMillis()) {
 //                continue;
 //            }
-
-            DateTime operatedAt = formatter.parseDateTime(status.get("operatedAt").asText());
-            //下架时间必须小于周期开始时间
-            if (!status.get("status").asText().equals("offline") && startTime.getMillis() < operatedAt.getMillis()) {
-                continue;
-            }
-            BsonDocument bsonDocument = new BsonDocument();
-            bsonDocument.put("cycleStartTime", new BsonDateTime(startTime.getMillis()));
-            bsonDocument.put("merchantId", new BsonString(v.get("owner").get("ownerId").asText()));
-            FindIterable<Document> limit = vehicle_inventory.find(bsonDocument).limit(1);
-            Document document = limit.iterator().tryNext();
-            if (document != null) {
-                List<Document> vehicleInventoryDetails = document.get("vehicleInventoryDetails", List.class);
-                if (vehicleInventoryDetails != null) {
-                    boolean flag = true;
-                    for (Document detail : vehicleInventoryDetails) {
-                        if (detail.getString("vehicleId").equals(v.get("id").asText())) {
-                            Event event = new Event(title, sheet, v, detail);
-                            events.put(event);
-                            flag = false;
-                        }
-                    }
-                    //周期内下架 不需要盘点
-                    if (status.get("status").asText().equals("offline") && endTime.getMillis() > operatedAt.getMillis()) {
-                        continue;
-                    }
-                    if (flag) {
-                        Event event = new Event(title, sheet, v, empty);
-                        events.put(event);
-                        System.out.println(v.get("serialNumber").asText() + " ;" + title);
-                    }
-
-                } else {
-                    //周期内下架 不需要盘点
-                    if (status.get("status").asText().equals("offline") && endTime.getMillis() > operatedAt.getMillis()) {
-                        continue;
-                    }
-                    System.out.println("vehicleInventoryDetails is null; " + v.get("serialNumber").asText() + " ;" + title);
-
-                    Event event = new Event(title, sheet, v, empty);
-                    events.put(event);
-                }
-            } else {
-                //周期内下架 不需要盘点
-                if (status.get("status").asText().equals("offline") && endTime.getMillis() > operatedAt.getMillis()) {
-                    continue;
-                }
-                System.out.println("document==null; " + v.get("serialNumber").asText() + " ;" + title);
-                Event event = new Event(title, sheet, v, empty);
-                events.put(event);
-            }
-        }
-        execute.close();
-        int totalPages = data.get("totalPages").asInt();
-        page += 1;
-        if (page == 1 && totalPages > 1) {
-//            int i1 = Math.min(10, totalPages);
-            for (int i = page; i <= totalPages; i++) {
-                int finalI = i;
-                Future<?> submit = executorService.submit(() -> {
-                    try {
-                        vehicles(sheet, finalI, size, title, startTime, endTime);
-                    } catch (IOException | InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                });
-                futures.put(submit);
-            }
-        }
-    }
+//            BsonDocument bsonDocument = new BsonDocument();
+//            bsonDocument.put("cycleStartTime", new BsonDateTime(startTime.getMillis()));
+//            bsonDocument.put("merchantId", new BsonString(v.get("owner").get("ownerId").asText()));
+//            FindIterable<Document> limit = vehicle_inventory.find(bsonDocument).limit(1);
+//            Document document = limit.iterator().tryNext();
+//            if (document != null) {
+//                List<Document> vehicleInventoryDetails = document.get("vehicleInventoryDetails", List.class);
+//                if (vehicleInventoryDetails != null) {
+//                    boolean flag = true;
+//                    for (Document detail : vehicleInventoryDetails) {
+//                        if (detail.getString("vehicleId").equals(v.get("id").asText())) {
+//                            Event event = new Event(title, sheet, v, detail);
+//                            events.put(event);
+//                            flag = false;
+//                        }
+//                    }
+//                    //周期内下架 不需要盘点
+//                    if (status.get("status").asText().equals("offline") && endTime.getMillis() > operatedAt.getMillis()) {
+//                        continue;
+//                    }
+//                    if (flag) {
+//                        Event event = new Event(title, sheet, v, empty);
+//                        events.put(event);
+//                        System.out.println(v.get("serialNumber").asText() + " ;" + title);
+//                    }
+//
+//                } else {
+//                    //周期内下架 不需要盘点
+//                    if (status.get("status").asText().equals("offline") && endTime.getMillis() > operatedAt.getMillis()) {
+//                        continue;
+//                    }
+//                    System.out.println("vehicleInventoryDetails is null; " + v.get("serialNumber").asText() + " ;" + title);
+//
+//                    Event event = new Event(title, sheet, v, empty);
+//                    events.put(event);
+//                }
+//            } else {
+//                //周期内下架 不需要盘点
+//                if (status.get("status").asText().equals("offline") && endTime.getMillis() > operatedAt.getMillis()) {
+//                    continue;
+//                }
+//                System.out.println("document==null; " + v.get("serialNumber").asText() + " ;" + title);
+//                Event event = new Event(title, sheet, v, empty);
+//                events.put(event);
+//            }
+//        }
+//        execute.close();
+//        int totalPages = data.get("totalPages").asInt();
+//        page += 1;
+//        if (page == 1 && totalPages > 1) {
+////            int i1 = Math.min(10, totalPages);
+//            for (int i = page; i <= totalPages; i++) {
+//                int finalI = i;
+//                Future<?> submit = executorService.submit(() -> {
+//                    try {
+//                        vehicles(sheet, finalI, size, title, startTime, endTime);
+//                    } catch (IOException | InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                });
+//                futures.put(submit);
+//            }
+//        }
+//    }
 
     private static JsonNode requestApi(String url) {
         HttpGet httpGet = new HttpGet(url);
@@ -282,7 +257,7 @@ public class ExportInventory {
             execute.close();
             boolean ok = response.at("/ok").asBoolean();
             if (!ok) {
-                System.out.println(response);
+                System.err.println(response);
             }
             return response.at("/data");
         } catch (IOException e) {

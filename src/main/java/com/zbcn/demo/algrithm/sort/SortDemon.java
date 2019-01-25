@@ -90,7 +90,7 @@ public class SortDemon {
     }
 
     /**
-     * 希尔排序，TODO 没看懂
+     * 希尔排序，TODO  希尔算法没看懂
      * @param arrays
      * @return
      */
@@ -99,9 +99,10 @@ public class SortDemon {
             return arrays;
         }
         int len = arrays.length;
-        int temp;
+        int temp; //插入算法的临时值
         int gap = len/2;
         while (gap > 0){
+            //小的插入排序
             for (int i = gap; i < len; i++) {
                 temp = arrays[i];
                 int preIndex = i -gap;

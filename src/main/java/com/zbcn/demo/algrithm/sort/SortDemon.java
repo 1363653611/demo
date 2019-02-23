@@ -117,13 +117,145 @@ public class SortDemon {
         return arrays;
     }
 
+    /**
+     * 并归排序(有问题)
+     * @param arrays
+     */
+    public static int[] mergerSort(int[] arrays){
+
+        if(arrays.length < 2){
+            return arrays;
+        }
+        int mid = arrays.length/2;//获取中间的长度
+        int[] left = Arrays.copyOfRange(arrays, 0, mid);//
+        int[] right = Arrays.copyOfRange(arrays, mid, arrays.length);
+        return merger(mergerSort(left),mergerSort(right));//回调函数
+
+    }
+
+    /**
+     * 并归算法
+     * @param left
+     * @param right
+     * @return
+     */
+    public static int[] merger(int[] left,int[] right){
+        int[] result = new int[left.length + right.length];//新数据的长度
+        for (int index = 0, i=0, j=0; index < result.length; index++) {
+            if (i >= left.length){
+                result[index] = right[j++];
+            }else if(j >= right.length){
+                result[index] = right[i++];
+            }else if(left[i] >right[j]){
+                result[index] = right[j++];
+            }else {
+                result[index] = left[i++];
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 快速排序
+     * @param arrays
+     * @return
+     */
+    public static int[] quickSort(int[] arrays,int left,int right){
+        //
+        if(left > right){
+            return arrays;
+        }
+        int temp,i,j,t;
+        temp = arrays[left];//存储基准数
+        i = left; //i为左哨兵
+        j = right; // j 为右哨兵
+
+        while(i != j){//顺序很重要，要先从右边开始找
+            while (arrays[j] >= temp && i < j){ //右 - 左
+                j--;
+            }
+            while(arrays[i] <= temp &&  i < j){ //左 - 右
+                i++;
+            }
+
+            if(i < j){ //交换两个数在数组中的位置
+                t = arrays[i];
+                arrays[i] = arrays[j];
+                arrays[j] = t;
+            }
+            //最终将基准数归位
+            arrays[left] = arrays[i];
+            arrays[i] = temp;
+        }
+        quickSort(arrays,left, i-1);//继续处理左边的，这里是一个递归的过程
+        quickSort(arrays,i+1, right);//继续处理右边的 ，这里是一个递归的过程
+
+//        int smallIndex = partition(arrays,start,end);
+//
+//        if(smallIndex > start){
+//            quickSort(arrays,start,smallIndex - 1);
+//        }
+//        if(smallIndex < end){
+//            quickSort(arrays,smallIndex + 1,end);
+//        }
+        //快速排序算法
+        return arrays;
+    }
+
+    /**
+     * 快速排序算法
+     * @param arrays
+     * @param end
+     * @param start
+     * @return
+     */
+    public static int partition(int[] arrays,int end,int start){
+
+        int pivot = (int)(start + Math.random()*(end - start + 1));
+        int smallIndex = start - 1;
+        swap(arrays,pivot,end);
+        for (int i = start; i <= end ; i++) {
+            if(arrays[i] <= arrays[end]){
+                smallIndex++;
+                if(i > smallIndex){
+                    swap(arrays,i,smallIndex);
+                }
+            }
+        }
+        return smallIndex;
+
+    }
+
+    /**
+     * 数据转换
+     * @param arrays
+     * @param i
+     * @param j
+     * @return
+     */
+    private static int[] swap(int[] arrays,int i, int j){
+
+        int temp = arrays[i];
+        arrays[i] = arrays[j];
+        arrays[j] = temp;
+        return arrays;
+    }
+
+
+
     public static void main(String[] args) {
-        int[] arrays = {1,6,5,4,2,8,4,66,32,22,11};
+        int[] arrays = {6,1,2,7,9,3,4,5,10,8};
         //冒泡排序
         //System.out.println(Arrays.toString(bubbleSort(arrays)));
         //选择排序
         //System.out.println(Arrays.toString(selectionSort(arrays)));
         //插入排序
-        System.out.println(Arrays.toString(insertSort(arrays)));
+        //System.out.println(Arrays.toString(insertSort(arrays)));
+        //希尔排序
+        //System.out.println(Arrays.toString(shellSort(arrays)));
+        //并归排序
+        //System.out.println(Arrays.toString(mergerSort(arrays)));
+        //快速排序
+        System.out.println(Arrays.toString(quickSort(arrays,0,arrays.length-1)));
     }
 }

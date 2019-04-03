@@ -3,6 +3,22 @@ server:
   address: 0.0.0.0
 #Matser的ip地址
 spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/shiro?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC&&useSSL=false
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
+  jpa:
+    database: mysql
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+  thymeleaf:
+    cache: false
+    mode: LEGACYHTML5
   redis:
     host: localhost
     port: 9367
@@ -36,6 +52,15 @@ spring:
 
     #sentinel.host2=172.20.1.231
     #sentinel.port2=26379
+  spring:
+    data:
+      mongodb:
+        host: 127.0.0.1
+        port: 27017
+        username: sunny
+        password: 123456
+        database: admin
+
   elastic:
     modelConversions: !!map
       demon:
@@ -48,14 +73,13 @@ spring:
         - /study/code
 
         mappings:
-
         - source: /name
           action: name
           target: /study/name
 
-   esIndexConfigs:
-    - bizCode: es_test
-      clusterName: test-c-api
-      indexName: zbcn
-      indexType: test
-      documentClass: com.zbcn.demo.elastic.domain.StudentDoc
+    esIndexConfigs:
+      - bizCode: es_test
+        clusterName: test-c-api
+        indexName: zbcn
+        indexType: test
+        documentClass: com.zbcn.demo.elastic.domain.StudentDoc

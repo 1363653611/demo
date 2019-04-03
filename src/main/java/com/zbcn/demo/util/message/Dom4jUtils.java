@@ -22,15 +22,11 @@ public class Dom4jUtils {
 		
 		SAXReader reader=new SAXReader();
 		Document doc = null;
-		
 		try {
 			doc=reader.read(new File(fileName));
 		} catch (DocumentException e) {
 			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
 		}
-
 		return doc;
 	}
 

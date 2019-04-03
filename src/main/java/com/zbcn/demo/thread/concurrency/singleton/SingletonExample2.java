@@ -8,11 +8,12 @@ import com.zbcn.demo.thread.concurrency.ThreadSafe;
  * @Date: 2/27/19 15:57
  */
 @ThreadSafe
-public class SingletonExample2 {
+public class
+SingletonExample2 {
 
     //单利对象
     private static SingletonExample2 instance = new SingletonExample2();
-    //私有化构造函数
+    //私有化构造函数RepositoryConfigurationSource
     private SingletonExample2(){
 
     }

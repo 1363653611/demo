@@ -1,7 +1,7 @@
 package com.zbcn.demo.java8.sync;
 
-import com.vividsolutions.jts.util.Assert;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -23,8 +23,8 @@ public class CompletableFeatureDemon {
      */
     public static void runcompletableExample(){
         CompletableFuture cf = CompletableFuture.completedFuture("message");
-        Assert.isTrue(cf.isDone());
-        Assert.equals("message",cf.getNow(null));
+        log.info("{}",cf.isDone());
+        log.info("message:{}",cf.getNow(null));
     }
 
     public static void runAsyncExample(){

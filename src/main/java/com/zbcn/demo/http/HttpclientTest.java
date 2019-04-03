@@ -32,7 +32,6 @@ public class HttpclientTest {
 
     private static void post(){
         CloseableHttpClient client = HttpClients.createDefault();
-
         HttpPost httpPost = new HttpPost("https://www.baidu.com");
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("scope","project"));

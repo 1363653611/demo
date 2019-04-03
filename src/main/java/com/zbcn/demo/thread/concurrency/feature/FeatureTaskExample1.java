@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.concurrent.*;
 
 /**
- * @Description:
+ * @Description: 可以用于异步获取执行结果或者取消执行任务的场景
  * @Auther: zbcn
  * @Date: 2/28/19 21:23
  */

@@ -2,10 +2,8 @@ package com.zbcn.demo.config;
 
 import com.zbcn.demo.redis.RedisUtil;
 import lombok.Data;
-import lombok.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisNode;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;
@@ -148,7 +146,7 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String,Object>  functionDomainRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    public RedisTemplate<String,Object> functionDomainRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         initDomainRedisTemplate(redisTemplate, redisConnectionFactory);
         return redisTemplate;

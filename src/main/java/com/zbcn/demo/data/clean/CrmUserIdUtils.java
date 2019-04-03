@@ -21,7 +21,6 @@ import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
-import org.springframework.data.annotation.Id;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -158,7 +157,7 @@ public class CrmUserIdUtils {
 @Data
 @org.springframework.data.mongodb.core.mapping.Document(collection = "vehicle_expired_tips")
 class VehicleExpiredTips {
-    @Id
+    //@Id
     private ObjectId id;
 
     /**

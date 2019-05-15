@@ -64,9 +64,9 @@ public class CrmUserIdUtils {
             for (JsonNode v : at){
                 String id = v.at("id").toString();
                 VehicleExpiredTips vehicleExpiredTips = new VehicleExpiredTips();
-                vehicleExpiredTips.setId(new ObjectId(id));
-                vehicleExpiredTips.setStatus(0);
-                vehicleExpiredTips.setModifyAt(DateTime.now());
+//                vehicleExpiredTips.setId(new ObjectId(id));
+//                vehicleExpiredTips.setStatus(0);
+//                vehicleExpiredTips.setModifyAt(DateTime.now());
 
         //list.add()
     }

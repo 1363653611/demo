@@ -1,4 +1,4 @@
-package com.zbcn.demo.basice.inner;
+package com.zbcn.demo.base.inner;
 
 import java.util.Random;
 

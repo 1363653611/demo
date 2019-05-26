@@ -1,4 +1,4 @@
-package com.zbcn.demo.inventory;
+package com.zbcn.demo.mongodb;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

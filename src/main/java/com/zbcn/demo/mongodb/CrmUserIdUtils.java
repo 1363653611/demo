@@ -1,4 +1,4 @@
-package com.zbcn.demo.data.clean;
+package com.zbcn.demo.mongodb;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

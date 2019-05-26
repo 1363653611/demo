@@ -1,4 +1,4 @@
-package com.zbcn.demo.generic;
+package com.zbcn.demo.base.generic;
 
 /**
  * 未传入泛型实参时，与泛型类的定义相同，在声明类的时候，需将泛型的声明也一起加到类中

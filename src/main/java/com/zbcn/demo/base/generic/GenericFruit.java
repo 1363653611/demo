@@ -1,4 +1,4 @@
-package com.zbcn.demo.generic;
+package com.zbcn.demo.base.generic;
 
 /**
  * TODO

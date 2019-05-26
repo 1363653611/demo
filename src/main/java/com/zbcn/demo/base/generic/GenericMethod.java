@@ -1,6 +1,4 @@
-package com.zbcn.demo.generic;
-
-import org.apache.poi.ss.formula.functions.T;
+package com.zbcn.demo.base.generic;
 
 /**
  * 泛型方法测试
@@ -29,7 +27,7 @@ public class GenericMethod {
     public static void main(String[] args) {
         Class<FruitGenerator> aClass = null;
         try {
-            aClass = (Class<FruitGenerator>) Class.forName("com.zbcn.demo.generic.FruitGenerator");
+            aClass = (Class<FruitGenerator>) Class.forName("com.zbcn.demo.base.generic.FruitGenerator");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }

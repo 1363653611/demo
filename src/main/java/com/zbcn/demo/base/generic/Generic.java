@@ -1,4 +1,4 @@
-package com.zbcn.demo.generic;
+package com.zbcn.demo.base.generic;
 
 import lombok.extern.slf4j.Slf4j;
 

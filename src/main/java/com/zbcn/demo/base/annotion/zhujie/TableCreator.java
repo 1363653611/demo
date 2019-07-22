@@ -1,16 +1,15 @@
 package com.zbcn.demo.base.annotion.zhujie;
 
+import com.zbcn.demo.base.annotion.zhujie.bzj.Constraints;
+import com.zbcn.demo.base.annotion.zhujie.bzj.DBTable;
+import com.zbcn.demo.base.annotion.zhujie.bzj.SQLInteger;
+import com.zbcn.demo.base.annotion.zhujie.bzj.SQLString;
+import org.apache.commons.lang3.StringUtils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.zbcn.zhujie.bzj.Constraints;
-import com.zbcn.zhujie.bzj.DBTable;
-import com.zbcn.zhujie.bzj.SQLInteger;
-import com.zbcn.zhujie.bzj.SQLString;
 
 /**        
  * Title: TableCreator.java

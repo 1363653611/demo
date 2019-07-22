@@ -81,11 +81,11 @@ public class Generic <T> {
      * 这个方法也是有问题的，编译器会为我们提示错误信息："UnKnown class 'T' "
      * 对于编译器来说T这个类型并未项目中声明过，因此编译也不知道该如何编译这个类。
      * 所以这也不是一个正确的泛型方法声明。
+     *
      public void showkey(T genericObj){
-
+         System.out.println(genericObj);
      }
      */
-
 
     /**
      * 1. 泛型的类型参数只能是类类型，不能是简单类型。
@@ -97,7 +97,6 @@ public class Generic <T> {
         Generic<Integer> integerGeneric = new Generic<>(1);
         //传入的实参类型需与泛型的类型参数类型相同，即为String.
         Generic<String> sss = new Generic<>("sss");
-
         //可以不传递任何参数，但是就没有了限制
         Generic integerGeneric1 = new Generic<>(1323);
         integerGeneric1.setKey("assdf");

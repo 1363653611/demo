@@ -1,11 +1,11 @@
 package com.zbcn.demo.base.annotion.zhujie;
 
-import com.zbcn.zhujie.bzj.Constraints;
-import com.zbcn.zhujie.bzj.DBTable;
-import com.zbcn.zhujie.bzj.SQLInteger;
-import com.zbcn.zhujie.bzj.SQLString;
+import com.zbcn.demo.base.annotion.zhujie.bzj.Constraints;
+import com.zbcn.demo.base.annotion.zhujie.bzj.DBTable;
+import com.zbcn.demo.base.annotion.zhujie.bzj.SQLInteger;
+import com.zbcn.demo.base.annotion.zhujie.bzj.SQLString;
 
-/**        
+/**
  * Title: Member.java
  * <p>    
  * Description: 数据库表Member对应实例类bean

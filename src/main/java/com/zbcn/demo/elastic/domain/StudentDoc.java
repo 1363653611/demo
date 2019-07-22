@@ -10,7 +10,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 /**
- * Created by nealmi on 8/31/16.
+ *
  */
 @Document(indexName = "zbcn", type = "test")
 @QueryMapping(mappedQueryString = "page", queryPolicy = QueryPolicy.IGNORE)

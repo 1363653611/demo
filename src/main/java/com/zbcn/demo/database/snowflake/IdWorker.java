@@ -2,7 +2,7 @@ package com.zbcn.demo.database.snowflake;
 
 /**
  * @Description:
- * @Auther: zbcn
+ * @author: zbcn
  * @Date: 2/26/19 10:27
  */
 public class IdWorker {

@@ -1,6 +1,6 @@
 package com.zbcn.demo.redis.lock;
 
-import com.zbcn.demo.util.option.Try;
+import com.zbcn.utils.option.Try;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;

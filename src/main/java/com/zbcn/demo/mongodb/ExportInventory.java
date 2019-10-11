@@ -37,11 +37,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * @author
+ * 2018/10/31
+ */
 public class ExportInventory {
     private static PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
     private static CloseableHttpClient httpClient = HttpClients.createSystem();
     private static String token = "401cbd7940d74835ad017238093b4312";
-    private static String vehicleUrl = "https://xxx.com/v1";
+    private static String vehicleUrl = "https://p-api.kanche.com/v1";
     //    private static MongoClient mongoClient = new MongoClient("localhost");
     private static MongoCredential credential = MongoCredential.createCredential("vehicle_rw", "admin", "Rfvbhu#!7620".toCharArray());
     private static MongoClient mongoClient = new MongoClient(new ServerAddress("10.3.9.32", 27017), credential, MongoClientOptions.builder().build());
@@ -356,7 +360,7 @@ public class ExportInventory {
     }
 
     private static String cities() {
-        HttpGet httpGet = new HttpGet("https://xxx/v1/groups/cities");
+        HttpGet httpGet = new HttpGet("https://p-api.kanche.com/v1/groups/cities");
         httpGet.setHeader("Authorization", token);
         try (CloseableHttpResponse execute = httpClient.execute(httpGet)) {
             String text = EntityUtils.toString(execute.getEntity());

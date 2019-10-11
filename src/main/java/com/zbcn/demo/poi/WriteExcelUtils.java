@@ -3,7 +3,6 @@ package com.zbcn.demo.poi;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -55,10 +54,10 @@ public class WriteExcelUtils {
      */
     private static CellStyle setWorkBookStyle(Workbook workBook) {
         CellStyle style = workBook.createCellStyle();
-        style.setBorderBottom(HSSFCellStyle.BORDER_THIN); //下边框
-        style.setBorderLeft(HSSFCellStyle.BORDER_THIN);//左边框
-        style.setBorderTop(HSSFCellStyle.BORDER_THIN);//上边框
-        style.setBorderRight(HSSFCellStyle.BORDER_THIN);//右边框
+        style.setBorderBottom(BorderStyle.THIN); //下边框
+        style.setBorderLeft(BorderStyle.THIN);//左边框
+        style.setBorderTop(BorderStyle.THIN);//上边框
+        style.setBorderRight(BorderStyle.THIN);//右边框
         style.setWrapText(true);//设置自动换行
         return style;
     }

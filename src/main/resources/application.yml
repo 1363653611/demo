@@ -52,14 +52,13 @@ spring:
 
     #sentinel.host2=172.20.1.231
     #sentinel.port2=26379
-  spring:
-    data:
-      mongodb:
-        host: 127.0.0.1
-        port: 27017
-        username: sunny
-        password: 123456
-        database: admin
+  data:
+    mongodb:
+      host: 127.0.0.1
+      port: 27017
+      username: sunny
+      password: 123456
+      database: admin
 
   elastic:
     modelConversions: !!map
@@ -83,3 +82,22 @@ spring:
         indexName: zbcn
         indexType: test
         documentClass: com.zbcn.demo.elastic.domain.StudentDoc
+  # 发送服务器
+  mail:
+    host: smtp.qq.com
+    port: -1 # SMTP服务器端口号 默认-1
+    username: 1363653611@qq.com
+    password: yohkywkznmjigjaj # 发送方密码（授权码）
+    properties: # 开启用户身份验证
+      mail:
+        smtp:
+          auth: true
+
+# 发送服务器
+# 发送的目标用户
+alarm:
+  email:
+    interval:
+      time: 300
+    receiver: zbcn810@163.com
+

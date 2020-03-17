@@ -28,6 +28,11 @@ public class ActorTest {
 
         //给produceMsgActor发消息请求
         produceMsgActor.tell("please produce msg1",ActorRef.noSender());
+
+        //给 disposeMsgActor 发消息
+        disposeMsgActor.tell(new Msg("我的天"),ActorRef.noSender());
+        sym.stop(produceMsgActor);
+        sym.stop(disposeMsgActor);
     }
 
 

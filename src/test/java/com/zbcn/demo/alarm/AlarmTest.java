@@ -15,6 +15,7 @@ public class AlarmTest {
 
 	@Test
 	public void alarm() {
+		emailAlarm.alarm("zbcn810@163.com",new RuntimeException("测试报警"));
 	}
 
 	@Test

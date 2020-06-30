@@ -80,7 +80,7 @@
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
-			<version>1.4.5</version>
+			<version>1.4.10-java7</version>
 		</dependency>
     <!--二维码-->
 		<!-- https://mvnrepository.com/artifact/com.google.zxing/zxing-parent -->
